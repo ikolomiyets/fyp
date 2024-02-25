@@ -44,9 +44,20 @@ func main() {
 	app.Post("/newAnswer", controller.NewAnswer)     //creates new answer for particular question and adds to db
 	app.Get("/questions", controller.GetQuestionsHandler)
 	//app.Get("/isSupervisor", controller.GetSupervisorHandler)
-	//app.Get("/getGantt/:id", controller.) //tofix
-	app.Get("/getGanttItem/:id", controller.GetGanttoItem)
-	app.Get("getSupervisors", controller.GetSupervisorHandler)
-
+	app.Get("getApplications", controller.GetApplicationsHandler)                     //retrieves all applications from db
+	app.Get("getSpecificApplications/:id", controller.GetSpecificApplicationsHandler) //retrieves one specific applications
+	app.Get("/getGanttItem/:id", controller.GetGanttItem)
+	app.Get("/getGantt/:id", controller.GetGantt)
+	app.Get("/getSupervisors", controller.GetSupervisorHandler)
+	//getapplications
+	//getspecificapplication
+	//post newquestion
+	//post newanswer
+	//post createproject
+	//post createapplication
+	//post acceptapplication
+	//post declineapplication
+	//post createganttitem
+	//post addfeedback
 	app.Listen(":3000")
 }

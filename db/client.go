@@ -3,9 +3,7 @@ package db
 import (
 	"FYP/model"
 	"context"
-	"github.com/gofiber/fiber/v2"
 	"log"
-	"net/http"
 )
 
 func (db Client) GetQuestions(ctx context.Context) ([]model.Question, error) {
@@ -68,7 +66,7 @@ func (db Client) GetQuestions(ctx context.Context) ([]model.Question, error) {
 
 }
 
-func (db Client) GetGantt(ctx context.Context, c *fiber.Ctx) ([]model.Gantt, error) { //gets all milestones within a project
+func (db Client) GetGantt(ctx context.Context, projectIdentifier string) ([]model.Gantt, error) { //gets all milestones within a project
 	rows, err := db.conn.QueryContext(ctx, "SELECT * from gantt_items")
 	if err != nil {
 		log.Printf("cannot execute query to get questions: %v", err)
@@ -76,7 +74,6 @@ func (db Client) GetGantt(ctx context.Context, c *fiber.Ctx) ([]model.Gantt, err
 	}
 
 	result := []model.Gantt{}
-	projectIdentifier := c.Params("id")
 	var (
 		id          string
 		projectID   string
@@ -170,40 +167,91 @@ func (db Client) GetSupervisors(ctx context.Context) ([]model.AccountSupervisor,
 	return result, nil
 }
 
-func (db Client) NewQuestion(ctx context.Context, c *fiber.Ctx) error { //adds new question to db
-	var questionData model.Question
-	if err := c.BodyParser(&questionData); err != nil {
-		log.Println("Error parsing JSON:", err)
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid JSON"})
-	}
-
-	id := questionData.ID
-	studentID := questionData.StudentID
-	supervisorID := questionData.SupervisorID
-	questionShort := questionData.QuestionShort
-	questionLong := questionData.Question
-
-	temp, err := db.conn.Prepare("INSERT INTO ticket (ticket_id, student_id, supervisor_id, questionShort, questionLong, answer, isAnswered) VALUES (?, ?, ?, ?, ?, ?, ?)")
+func (db Client) GetApplications(ctx context.Context) ([]model.ApplicationData, error) {
+	rows, err := db.conn.QueryContext(ctx, "SELECT * from applications")
 	if err != nil {
-		log.Printf("couldn't prepare sql query")
-		return err
+		log.Printf("cannot execute query to get applications: %v", err)
+		return nil, err
 	}
-	result, err := temp.Exec(id, studentID, supervisorID, questionShort, questionLong, "", false)
-	if err != nil {
-		log.Printf("couldn't fill out new entry through executing previously prepared sql query")
-		return err
-	}
-	log.Printf("student: %v added new question %v "+studentID, result)
+	result := []model.ApplicationData{}
+	var (
+		id           string
+		studentID    string
+		supervisorID string
+		heading      string
+		description  string
+		accepted     bool
+		declined     bool
+	)
+	for rows.Next() {
+		err = rows.Scan(&id, &studentID, &supervisorID, &heading, &description, &accepted, &declined)
+		if err != nil {
+			log.Printf("cannot read data while getting questions: %v", err)
+		}
 
+		result = append(result, model.ApplicationData{
+			ID:           id,
+			StudentID:    studentID,
+			SupervisorID: supervisorID,
+			Heading:      heading,
+			Description:  description,
+			Accepted:     accepted,
+			Declined:     declined,
+		})
+	}
+	return result, nil
+
+}
+
+func (db Client) GetSpecificApplications(ctx context.Context, appID string) ([]model.ApplicationData, error) {
+	rows, err := db.conn.QueryContext(ctx, "SELECT * from applications")
+	if err != nil {
+		log.Printf("cannot execute query to get applications: %v", err)
+		return nil, err
+	}
+	result := []model.ApplicationData{}
+	var (
+		id           string
+		studentID    string
+		supervisorID string
+		heading      string
+		description  string
+		accepted     bool
+		declined     bool
+	)
+	for rows.Next() {
+		err = rows.Scan(&id, &studentID, &supervisorID, &heading, &description, &accepted, &declined)
+		if err != nil {
+			log.Printf("cannot read data while getting questions: %v", err)
+		}
+		if id == appID {
+			result = append(result, model.ApplicationData{
+				ID:           id,
+				StudentID:    studentID,
+				SupervisorID: supervisorID,
+				Heading:      heading,
+				Description:  description,
+				Accepted:     accepted,
+				Declined:     declined,
+			})
+		}
+	}
+	return result, nil
+
+}
+
+func (db Client) NewQuestion(ctx context.Context, question Question, questionText string, id string) error { //adds new question to db
+	//create question item for db
+	//variables that are created and not taken: ID, Isanswered will be false
 	return nil
 }
 
-func (db Client) NewAnswer(ctx context.Context, c *fiber.Ctx) error { //adds new question to db
+func (db Client) NewAnswer(ctx context.Context) error { //adds new question to db
+	//todo
 	var questionData model.Question
 
-	updateQuery := "UPDATE tickets SET answer = ?, is = is_answered = ? WHERE ticket_id = ?"
+	updateQuery := "UPDATE tickets SET answer = ?, is_answered = ? WHERE ticket_id = ?"
 
-	c.Body()
 	id := questionData.ID
 	answer := questionData.Answer
 	isAnswered := true
@@ -219,5 +267,106 @@ func (db Client) NewAnswer(ctx context.Context, c *fiber.Ctx) error { //adds new
 }
 
 func (db Client) CreateProject(ctx context.Context, project Project) error {
+	id := project.ID
+	studentID := project.StudentID
+	name := project.Name
+	time := project.CreatedAt
+	supervisorID := project.SupervisorID
+
+	updateQuery := "INSERT INTO projects (id, studentID, name, time, supervisor) VALUES (?, ?, ?, ?, ?)"
+
+	result, err := db.conn.Exec(updateQuery, id, studentID, name, time, supervisorID)
+	if err != nil {
+		log.Printf("failed to add answer to corresponding ticket in db")
+		return err
+	}
+	rowsAffected, _ := result.RowsAffected()
+	log.Printf("created %d row.\n", rowsAffected)
 	return nil
+
+}
+
+func (db Client) CreateApplication(ctx context.Context, application Application) error {
+	id := application.Id
+	studentID := application.StudentID
+	supervisorID := application.SupervisorID
+	heading := application.Heading
+	description := application.Description
+
+	updateQuery := "INSERT INTO applications (id, studentID, supervisor, heading, description) VALUES (?, ?, ?, ?, ?)"
+
+	result, err := db.conn.Exec(updateQuery, id, studentID, supervisorID, heading, description)
+	if err != nil {
+		log.Printf("failed to add answer to corresponding ticket in db")
+		return err
+	}
+	rowsAffected, _ := result.RowsAffected()
+	log.Printf("created %d row.\n", rowsAffected)
+	return nil
+}
+
+func (db Client) AcceptApplication(ctx context.Context, application Application) error {
+
+	updateQuery := "UPDATE tickets SET accepted = ? WHERE id = ?"
+
+	result, err := db.conn.Exec(updateQuery, true, application.Id)
+	if err != nil {
+		log.Printf("failed to accept application")
+		return err
+	}
+	rowsAffected, _ := result.RowsAffected()
+	log.Printf("created %d row.\n", rowsAffected)
+	return nil
+}
+
+func (db Client) DeclineApplication(ctx context.Context, application Application) error {
+
+	updateQuery := "UPDATE tickets SET declined = ? WHERE id = ?"
+
+	result, err := db.conn.Exec(updateQuery, true, application.Id)
+	if err != nil {
+		log.Printf("failed to decline application")
+		return err
+	}
+	rowsAffected, _ := result.RowsAffected()
+	log.Printf("created %d row.\n", rowsAffected)
+	return nil
+}
+
+func (db Client) CreateGanttItem(ctx context.Context, gantt Gantt) error {
+
+	id := gantt.Id
+	projectID := gantt.ProjectID
+	description := gantt.Description
+	startDate := gantt.StartDate
+	endDate := gantt.EndDate
+	feedback := gantt.Feedback
+	links := gantt.Links
+
+	updateQuery := "INSERT INTO ganttItems (id, projectID, description, startDate, endDate, feedback, links) VALUES (?, ?, ?, ?, ?, ?, ?)"
+
+	result, err := db.conn.Exec(updateQuery, id, projectID, description, startDate, endDate, feedback, links)
+	if err != nil {
+		log.Printf("failed to create new gantt item/milestone to the project")
+		return err
+	}
+	rowsAffected, _ := result.RowsAffected()
+	log.Printf("created %d row.\n", rowsAffected)
+	return nil
+}
+
+func (db Client) UpdateFeedback(ctx context.Context, gantt Gantt, id string, feedback string) error {
+	updateQuery := "UPDATE ganttItems SET feedback = ? WHERE id = ?"
+
+	newFeedback := gantt.Feedback + "\n\n" + feedback
+
+	result, err := db.conn.Exec(updateQuery, newFeedback, id)
+	if err != nil {
+		log.Printf("failed to update feeback")
+		return err
+	}
+	rowsAffected, _ := result.RowsAffected()
+	log.Printf("created %d row.\n", rowsAffected)
+	return nil
+
 }
