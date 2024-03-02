@@ -15,7 +15,7 @@ func New(config *Config) fiber.Handler {
 			return c.Next()
 		}
 
-		// Try to find if the requested endpoint has the authorization scopes confifured
+		// Try to find if the requested endpoint has the authorization scopes configured
 		pathRequestMatcher := config.requestMatcher[c.OriginalURL()]
 
 		if pathRequestMatcher == nil {

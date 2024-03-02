@@ -14,6 +14,66 @@ type DBMock struct {
 	GetGanttItemCallNumber int
 }
 
+func (db DBMock) CreateGanttItem(ctx context.Context, gantt db.Gantt) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (db DBMock) UpdateFeedback(ctx context.Context, gantt db.Gantt, id string, feedback string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (db DBMock) CreateApplication(ctx context.Context, application db.Application) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (db DBMock) AcceptApplication(ctx context.Context, application db.Application) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (db DBMock) DeclineApplication(ctx context.Context, application db.Application) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (db DBMock) GetQuestions(ctx context.Context) ([]model.Question, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (db DBMock) GetSupervisors(ctx context.Context) ([]model.AccountSupervisor, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (db DBMock) GetApplications(ctx context.Context) ([]model.ApplicationData, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (db DBMock) GetSpecificApplications(ctx context.Context, appID string) ([]model.ApplicationData, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (db DBMock) NewQuestion(ctx context.Context) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (db DBMock) NewAnswer(ctx context.Context) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (db DBMock) GetGantt(ctx context.Context, projectIdentifier string) ([]model.Gantt, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (db DBMock) GetGanttItem(ctx context.Context, milestoneIdentifier string) ([]model.Gantt, error) {
 	db.GetGanttItemCallNumber++
 	return db.GetGanttItemResponse, db.GetGanttItemError
@@ -23,7 +83,7 @@ func (db DBMock) CreateProject(ctx context.Context, project db.Project) error {
 	return nil
 }
 
-func TestGetGanttoItem(t *testing.T) {
+func TestGetGanttItem(t *testing.T) {
 	dbMock := DBMock{
 		GetGanttItemResponse: []model.Gantt{
 			{
@@ -44,7 +104,7 @@ func TestGetGanttoItem(t *testing.T) {
 
 	ctx := &fiber.Ctx{}
 
-	err := testController.GetGanttoItem(ctx)
+	err := testController.GetGantt(ctx)
 	if err != nil {
 		t.Error(err)
 	}

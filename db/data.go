@@ -11,7 +11,7 @@ type Project struct {
 }
 
 type Application struct {
-	Id           string
+	ID           string
 	StudentID    string
 	SupervisorID string
 	Heading      string

@@ -240,7 +240,7 @@ func (db Client) GetSpecificApplications(ctx context.Context, appID string) ([]m
 
 }
 
-func (db Client) NewQuestion(ctx context.Context, question Question, questionText string, id string) error { //adds new question to db
+func (db Client) NewQuestion(ctx context.Context) error { //adds new question to db
 	//create question item for db
 	//variables that are created and not taken: ID, Isanswered will be false
 	return nil
@@ -287,7 +287,7 @@ func (db Client) CreateProject(ctx context.Context, project Project) error {
 }
 
 func (db Client) CreateApplication(ctx context.Context, application Application) error {
-	id := application.Id
+	id := application.ID
 	studentID := application.StudentID
 	supervisorID := application.SupervisorID
 	heading := application.Heading
@@ -309,7 +309,7 @@ func (db Client) AcceptApplication(ctx context.Context, application Application)
 
 	updateQuery := "UPDATE tickets SET accepted = ? WHERE id = ?"
 
-	result, err := db.conn.Exec(updateQuery, true, application.Id)
+	result, err := db.conn.Exec(updateQuery, true, application.ID)
 	if err != nil {
 		log.Printf("failed to accept application")
 		return err
@@ -323,7 +323,7 @@ func (db Client) DeclineApplication(ctx context.Context, application Application
 
 	updateQuery := "UPDATE tickets SET declined = ? WHERE id = ?"
 
-	result, err := db.conn.Exec(updateQuery, true, application.Id)
+	result, err := db.conn.Exec(updateQuery, true, application.ID)
 	if err != nil {
 		log.Printf("failed to decline application")
 		return err

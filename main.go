@@ -20,7 +20,7 @@ func main() {
 	}))
 
 	dbClient := db.MustCreate(os.Getenv("DB_URL"), os.Getenv("DB_USERNAME"), os.Getenv("DB_PASSWORD")) // create db client
-	controller := handlers.New(dbClient)                                                               //dependancy injection
+	controller := handlers.New(dbClient)                                                               //dependency injection
 
 	// Initialize oauth2 middleware
 	oauth2Config, err := oauth2.Build(
@@ -44,20 +44,16 @@ func main() {
 	app.Post("/newAnswer", controller.NewAnswer)     //creates new answer for particular question and adds to db
 	app.Get("/questions", controller.GetQuestionsHandler)
 	//app.Get("/isSupervisor", controller.GetSupervisorHandler)
-	app.Get("getApplications", controller.GetApplicationsHandler)                     //retrieves all applications from db
-	app.Get("getSpecificApplications/:id", controller.GetSpecificApplicationsHandler) //retrieves one specific applications
+	app.Get("/getApplications", controller.GetApplicationsHandler)                     //retrieves all applications from db
+	app.Get("/getSpecificApplications/:id", controller.GetSpecificApplicationsHandler) //retrieves one specific applications
 	app.Get("/getGanttItem/:id", controller.GetGanttItem)
 	app.Get("/getGantt/:id", controller.GetGantt)
 	app.Get("/getSupervisors", controller.GetSupervisorHandler)
-	//getapplications
-	//getspecificapplication
-	//post newquestion
-	//post newanswer
-	//post createproject
-	//post createapplication
-	//post acceptapplication
-	//post declineapplication
-	//post createganttitem
-	//post addfeedback
+	app.Post("/createProject", controller.CreateProjectHandler)            //post createproject
+	app.Post("/createApplication", controller.CreateApplicationHandler)    //post createapplication
+	app.Patch("/acceptApplication", controller.AcceptApplicationHandler)   //patch acceptapplication
+	app.Patch("/declineApplication", controller.DeclineApplicationHandler) //patch declineapplication
+	app.Post("/createGanttItem", controller.CreateGanttItemHandler)        //creates Gantt item in db
+	app.Patch("/updateFeedback/:feedback", controller.AddFeedbackHandler)
 	app.Listen(":3000")
 }

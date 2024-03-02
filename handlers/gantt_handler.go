@@ -62,3 +62,76 @@ func (c Controller) CreateProjectHandler(ctx *fiber.Ctx) error {
 
 	return ctx.SendStatus(204)
 }
+
+func (c Controller) CreateGanttItemHandler(ctx *fiber.Ctx) error {
+
+	// Read the request body
+	var gantt model.Gantt
+
+	err := json.Unmarshal(ctx.Body(), &gantt)
+	if err != nil {
+		message := model.ErrorMessage{
+			Message: err.Error(),
+		}
+		return ctx.Status(400).JSON(message)
+	}
+
+	// Translate it to the db request
+	ganttRequest := db.Gantt{
+		Id:          gantt.ID,
+		ProjectID:   gantt.ProjectID,
+		StartDate:   gantt.StartDate,
+		EndDate:     gantt.EndDate,
+		Description: gantt.Description,
+		Links:       gantt.Links,
+		Feedback:    gantt.Feedback,
+	}
+
+	// Execute db request
+	err = c.dbClient.CreateGanttItem(ctx.Context(), ganttRequest)
+	if err != nil {
+		message := model.ErrorMessage{
+			Message: err.Error(),
+		}
+		return ctx.Status(500).JSON(message)
+	}
+
+	return ctx.SendStatus(204)
+}
+
+func (c Controller) AddFeedbackHandler(ctx *fiber.Ctx) error {
+	// Read the request body
+	var gantt model.Gantt
+
+	feedback := ctx.Params("feedback")
+
+	err := json.Unmarshal(ctx.Body(), &gantt)
+	if err != nil {
+		message := model.ErrorMessage{
+			Message: err.Error(),
+		}
+		return ctx.Status(400).JSON(message)
+	}
+
+	// Translate it to the db request
+	ganttRequest := db.Gantt{
+		Id:          gantt.ID,
+		ProjectID:   gantt.ProjectID,
+		StartDate:   gantt.StartDate,
+		EndDate:     gantt.EndDate,
+		Description: gantt.Description,
+		Links:       gantt.Links,
+		Feedback:    gantt.Feedback,
+	}
+
+	// Execute db request
+	err = c.dbClient.UpdateFeedback(ctx.Context(), ganttRequest, gantt.ID, feedback)
+	if err != nil {
+		message := model.ErrorMessage{
+			Message: err.Error(),
+		}
+		return ctx.Status(500).JSON(message)
+	}
+
+	return ctx.SendStatus(204)
+}
