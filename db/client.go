@@ -3,11 +3,12 @@ package db
 import (
 	"FYP/model"
 	"context"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"log"
 )
 
 func (db Client) GetQuestions(ctx context.Context) ([]model.Question, error) {
-	rows, err := db.conn.QueryContext(ctx, "SELECT * from QUESTIONS")
+	rows, err := db.conn.QueryContext(ctx, "SELECT ticket_id, question from QUESTIONS")
 	if err != nil {
 		log.Printf("cannot execute query to get questions: %v", err)
 		return nil, err
@@ -23,6 +24,7 @@ func (db Client) GetQuestions(ctx context.Context) ([]model.Question, error) {
 		err = rows.Scan(&id, &question)
 		if err != nil {
 			log.Printf("cannot read data while getting questions: %v", err)
+			return nil, err
 		}
 
 		result = append(result, model.Question{

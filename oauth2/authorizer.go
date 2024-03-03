@@ -38,6 +38,11 @@ func New(config *Config) fiber.Handler {
 			return unmatched(config, c, 401)
 		}
 
+		authorizationHeaders := c.GetReqHeaders()["Authorization"]
+		if len(authorizationHeaders) == 0 {
+			c.Response().SetStatusCode(401)
+			return nil
+		}
 		// Get authorization header, which is passed as 'Bearer <access_token>'
 		authorizationHeader := c.GetReqHeaders()["Authorization"][0]
 		if authorizationHeader == "" {
