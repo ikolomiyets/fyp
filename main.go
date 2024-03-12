@@ -33,7 +33,7 @@ func main() {
 		oauth2.Request("GET", "/questions", []string{"read:questions"}),
 	)
 	if err != nil {
-		log.Println("cannot create OAuth2 middleware")
+		log.Printf("cannot create OAuth2 middleware: %v", err)
 		os.Exit(2)
 	}
 

@@ -1,8 +1,0 @@
-version: "3.7"
-services:
-  postgres:
-    image: simplyphotons/fct-db:v1.0
-    ports:
-      - 5432:5432
-    environment:
-      - POSTGRES_PASSWORD=Password1
