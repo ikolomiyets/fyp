@@ -8,7 +8,7 @@ import (
 )
 
 func (db Client) GetQuestions(ctx context.Context) ([]model.Question, error) {
-	rows, err := db.conn.QueryContext(ctx, "SELECT ticket_id, question from QUESTIONS")
+	rows, err := db.conn.QueryContext(ctx, "SELECT ticket_id, questionshort from tickets")
 	if err != nil {
 		log.Printf("cannot execute query to get questions: %v", err)
 		return nil, err
@@ -69,7 +69,7 @@ func (db Client) GetQuestions(ctx context.Context) ([]model.Question, error) {
 }
 
 func (db Client) GetGantt(ctx context.Context, projectIdentifier string) ([]model.Gantt, error) { //gets all milestones within a project
-	rows, err := db.conn.QueryContext(ctx, "SELECT * from gantt_items")
+	rows, err := db.conn.QueryContext(ctx, "SELECT item_id, project_id, gantt_name, start_date, end_date, description, links, feedback from gantt_items where project_id = $1", projectIdentifier)
 	if err != nil {
 		log.Printf("cannot execute query to get questions: %v", err)
 		return nil, err
@@ -80,33 +80,34 @@ func (db Client) GetGantt(ctx context.Context, projectIdentifier string) ([]mode
 		id          string
 		projectID   string
 		startDate   string
+		ganttName   string
 		endDate     string
 		description string
 		links       string
 		feedback    string
 	)
 	for rows.Next() {
-		err = rows.Scan(&id, &projectID, &startDate, &endDate, &description, &links, &feedback)
+		err = rows.Scan(&id, &projectID, &ganttName, &startDate, &endDate, &description, &links, &feedback)
 		if err != nil {
 			log.Printf("cannot read data while getting questions: %v", err)
+			return nil, err
 		}
-		if projectID == projectIdentifier {
-			result = append(result, model.Gantt{
-				ID:          id,
-				ProjectID:   projectID,
-				StartDate:   startDate,
-				EndDate:     endDate,
-				Description: description,
-				Links:       links,
-				Feedback:    feedback,
-			})
-		}
+		result = append(result, model.Gantt{
+			ID:          id,
+			ProjectID:   projectID,
+			GanttName:   ganttName,
+			StartDate:   startDate,
+			EndDate:     endDate,
+			Description: description,
+			Links:       links,
+			Feedback:    feedback,
+		})
 	}
 	return result, nil
 }
 
 func (db Client) GetGanttItem(ctx context.Context, milestoneIdentifier string) ([]model.Gantt, error) { //gets one milestone
-	rows, err := db.conn.QueryContext(ctx, "SELECT * from gantt_items")
+	rows, err := db.conn.QueryContext(ctx, "SELECT item_id, project_id, gantt_name, start_date, end_date, description, links, feedback from gantt_items where item_id = $1", milestoneIdentifier)
 	if err != nil {
 		log.Printf("cannot execute query to get questions: %v", err)
 		return nil, err
@@ -116,6 +117,7 @@ func (db Client) GetGanttItem(ctx context.Context, milestoneIdentifier string) (
 	var (
 		id          string
 		projectID   string
+		ganttName   string
 		startDate   string
 		endDate     string
 		description string
@@ -123,27 +125,29 @@ func (db Client) GetGanttItem(ctx context.Context, milestoneIdentifier string) (
 		feedback    string
 	)
 	for rows.Next() {
-		err = rows.Scan(&id, &projectID, &startDate, &endDate, &description, &links, &feedback)
+		err = rows.Scan(&id, &projectID, &ganttName, &startDate, &endDate, &description, &links, &feedback)
 		if err != nil {
 			log.Printf("cannot read data while getting questions: %v", err)
+			return nil, err
 		}
-		if projectID == milestoneIdentifier {
-			result = append(result, model.Gantt{
-				ID:          id,
-				ProjectID:   projectID,
-				StartDate:   startDate,
-				EndDate:     endDate,
-				Description: description,
-				Links:       links,
-				Feedback:    feedback,
-			})
-		}
+
+		result = append(result, model.Gantt{
+			ID:          id,
+			ProjectID:   projectID,
+			GanttName:   ganttName,
+			StartDate:   startDate,
+			EndDate:     endDate,
+			Description: description,
+			Links:       links,
+			Feedback:    feedback,
+		})
+
 	}
 	return result, nil
 }
 
 func (db Client) GetSupervisors(ctx context.Context) ([]model.AccountSupervisor, error) { //for use in displaying all available supervisors when a student is creating a new project application.
-	rows, err := db.conn.QueryContext(ctx, "SELECT * from users")
+	rows, err := db.conn.QueryContext(ctx, "SELECT id, name from users")
 	if err != nil {
 		log.Printf("cannot execute query to get users: %v", err)
 		return nil, err
@@ -170,7 +174,7 @@ func (db Client) GetSupervisors(ctx context.Context) ([]model.AccountSupervisor,
 }
 
 func (db Client) GetApplications(ctx context.Context) ([]model.ApplicationData, error) {
-	rows, err := db.conn.QueryContext(ctx, "SELECT * from applications")
+	rows, err := db.conn.QueryContext(ctx, "SELECT id, student_id, supervisor_id, heading, description, accepted, declined from applications")
 	if err != nil {
 		log.Printf("cannot execute query to get applications: %v", err)
 		return nil, err
@@ -205,8 +209,8 @@ func (db Client) GetApplications(ctx context.Context) ([]model.ApplicationData, 
 
 }
 
-func (db Client) GetSpecificApplications(ctx context.Context, appID string) ([]model.ApplicationData, error) {
-	rows, err := db.conn.QueryContext(ctx, "SELECT * from applications")
+func (db Client) GetSpecificApplications(ctx context.Context, appID string) ([]model.ApplicationData, error) { // todo make get application for supervisors
+	rows, err := db.conn.QueryContext(ctx, "SELECT id, student_id, supervisor_id, heading, description, accepted, declined from applications where id = $1", appID)
 	if err != nil {
 		log.Printf("cannot execute query to get applications: %v", err)
 		return nil, err
@@ -226,17 +230,17 @@ func (db Client) GetSpecificApplications(ctx context.Context, appID string) ([]m
 		if err != nil {
 			log.Printf("cannot read data while getting questions: %v", err)
 		}
-		if id == appID {
-			result = append(result, model.ApplicationData{
-				ID:           id,
-				StudentID:    studentID,
-				SupervisorID: supervisorID,
-				Heading:      heading,
-				Description:  description,
-				Accepted:     accepted,
-				Declined:     declined,
-			})
-		}
+
+		result = append(result, model.ApplicationData{
+			ID:           id,
+			StudentID:    studentID,
+			SupervisorID: supervisorID,
+			Heading:      heading,
+			Description:  description,
+			Accepted:     accepted,
+			Declined:     declined,
+		})
+
 	}
 	return result, nil
 
@@ -280,6 +284,21 @@ func (db Client) CreateProject(ctx context.Context, project Project) error {
 	result, err := db.conn.Exec(updateQuery, id, studentID, name, time, supervisorID)
 	if err != nil {
 		log.Printf("failed to add answer to corresponding ticket in db")
+		return err
+	}
+	rowsAffected, _ := result.RowsAffected()
+	log.Printf("created %d row.\n", rowsAffected)
+	return nil
+
+}
+
+func (db Client) CreateUser(ctx context.Context, user User) error {
+	id := user.id
+	updateQuery := "INSERT INTO users (id) VALUES (?)"
+
+	result, err := db.conn.Exec(updateQuery, id)
+	if err != nil {
+		log.Printf("failed to add user to corresponding ticket in db")
 		return err
 	}
 	rowsAffected, _ := result.RowsAffected()

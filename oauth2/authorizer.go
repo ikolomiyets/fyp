@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"FYP/security"
 	"context"
 	"errors"
 	"fmt"
@@ -50,6 +51,21 @@ func New(config *Config) fiber.Handler {
 			return nil
 		}
 
+		ctx := c.UserContext()
+		tokenString, err := extractToken(ctx, authorizationHeader)
+
+		if err != nil {
+			return err
+		}
+
+		authority, err := config.parseToken(ctx, tokenString)
+		if err != nil {
+			return err
+		}
+
+		ctx = context.WithValue(ctx, security.AuthorityKey{}, *authority)
+		c.SetUserContext(ctx)
+
 		// Validate scopes and if scopes are matching, allow request to pass through
 		// Otherwise respond either with 401 or 403 code:
 		//    401 - unauthenticated, usually means that there is no authorization header, or it is incorrect, for example
@@ -59,7 +75,7 @@ func New(config *Config) fiber.Handler {
 		//
 		//    403 - when scopes in the scope claim do not match any of the configured scopes for the combination of
 		//          endpoint and method
-		valid, err := config.validateScopes(context.Background(), authorizationHeader, scopes)
+		valid, err := config.validateScopes(context.Background(), authority, scopes)
 		if err != nil {
 			switch err {
 			case ErrInsufficientScope:

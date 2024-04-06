@@ -3,7 +3,9 @@ package handlers
 import (
 	"FYP/db"
 	"FYP/model"
+	"FYP/security"
 	"encoding/json"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -30,6 +32,19 @@ func (c Controller) GetSpecificApplicationsHandler(ctx *fiber.Ctx) error { //get
 }
 
 func (c Controller) CreateApplicationHandler(ctx *fiber.Ctx) error {
+	var (
+		authority security.Authority
+		ok        bool
+	)
+	if authority, ok = ctx.UserContext().Value(security.AuthorityKey{}).(security.Authority); !ok {
+		message := model.ErrorMessage{
+			Message: "cannot extract user id",
+		}
+
+		return ctx.Status(401).JSON(message)
+	}
+
+	fmt.Printf("%s", authority.UserID)
 
 	// Read the request body
 	var application model.ApplicationData

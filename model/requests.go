@@ -34,6 +34,7 @@ type GetGanttResponse struct {
 type Gantt struct {
 	ID          string `json:"id"`
 	ProjectID   string `json:"projectID"`
+	GanttName   string `json:"ganttName"`
 	StartDate   string `json:"startDate"`
 	EndDate     string `json:"endDate"`
 	Description string `json:"description"`

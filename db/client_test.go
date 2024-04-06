@@ -35,7 +35,7 @@ func TestClient_GetQuestions(t *testing.T) {
 	}
 	defer db.Close()
 
-	mock.ExpectQuery("SELECT ticket_id, question from QUESTIONS").
+	mock.ExpectQuery("SELECT ticket_id, question from tickets").
 		WillReturnRows(sqlmock.NewRows(
 			[]string{
 				"ticket_id", "question",
@@ -68,7 +68,7 @@ func TestClient_GetQuestionsWithQueryError(t *testing.T) {
 	}
 	defer db.Close()
 
-	mock.ExpectQuery("SELECT ticket_id, question from QUESTIONS").WillReturnError(errors.New("cannot query"))
+	mock.ExpectQuery("SELECT ticket_id, question from tickets").WillReturnError(errors.New("cannot query"))
 
 	d := &Client{
 		conn: db,
@@ -90,7 +90,7 @@ func TestClient_GetQuestionsWithScanError(t *testing.T) {
 	}
 	defer db.Close()
 
-	mock.ExpectQuery("SELECT ticket_id, question from QUESTIONS").
+	mock.ExpectQuery("SELECT ticket_id, question from tickets").
 		WillReturnRows(sqlmock.NewRows(
 			[]string{
 				"ticket_id", "question",

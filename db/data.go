@@ -2,6 +2,10 @@ package db
 
 import "time"
 
+type User struct {
+	id string //id
+}
+
 type Project struct {
 	ID           string
 	Name         string
@@ -23,6 +27,7 @@ type Application struct {
 type Gantt struct {
 	Id          string
 	ProjectID   string
+	GanttName   string
 	StartDate   string
 	EndDate     string
 	Description string
