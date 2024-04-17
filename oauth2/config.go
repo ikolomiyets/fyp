@@ -13,12 +13,18 @@ import (
 
 // Config contains middleware configuration
 type Config struct {
-	jksConfiguration Jwks
-	issuer           string
-	debug            bool
-	audience         string
-	requestMatcher   map[string]map[string][]string
-	allowUnmatched   bool
+	jksConfiguration     Jwks
+	issuer               string
+	debug                bool
+	audience             string
+	requestMatcher       map[string]map[string][]string
+	allowUnmatched       bool
+	clientAudience       string
+	clientId             string
+	clientSecret         string
+	tokenUrl             string
+	accessToken          string
+	accessTokenExpiresAt time.Time
 }
 
 func (o *Config) parseToken(ctx context.Context, tokenString string) (*security.Authority, error) {

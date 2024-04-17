@@ -1,9 +1,8 @@
 package db
 
-import "time"
-
 type User struct {
-	id string //id
+	Id   string //id
+	Name string
 }
 
 type Project struct {
@@ -11,12 +10,12 @@ type Project struct {
 	Name         string
 	StudentID    string
 	SupervisorID string
-	CreatedAt    time.Time
 }
 
 type Application struct {
 	ID           string
 	StudentID    string
+	StudentName  string
 	SupervisorID string
 	Heading      string
 	Description  string
@@ -36,7 +35,11 @@ type Gantt struct {
 }
 
 type Question struct {
-	Id string
-	//todo
-
+	Id            string
+	studentID     string
+	supervisorID  string
+	questionShort string
+	questionLong  string
+	answer        string
+	is_answered   bool
 }

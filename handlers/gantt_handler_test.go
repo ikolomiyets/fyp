@@ -14,6 +14,16 @@ type DBMock struct {
 	GetGanttItemCallNumber int
 }
 
+func (db DBMock) GetProjects(ctx context.Context, supervisor_id string) ([]model.ProjectData, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (db DBMock) GetUsername(ctx context.Context, userId string) (string, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (db DBMock) CreateGanttItem(ctx context.Context, gantt db.Gantt) error {
 	//TODO implement me
 	panic("implement me")
@@ -44,7 +54,7 @@ func (db DBMock) GetQuestions(ctx context.Context) ([]model.Question, error) {
 	panic("implement me")
 }
 
-func (db DBMock) GetSupervisors(ctx context.Context) ([]model.AccountSupervisor, error) {
+func (db DBMock) GetSupervisors(ctx context.Context) ([]model.UserData, error) {
 	//TODO implement me
 	panic("implement me")
 }

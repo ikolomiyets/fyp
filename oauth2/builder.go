@@ -23,6 +23,10 @@ type Builder struct {
 	httpClient     HttpClient
 	requestMatcher map[string]map[string][]string
 	allowUnmatched bool
+	clientAudience string
+	clientId       string
+	clientSecret   string
+	tokenUrl       string
 }
 
 // Option type for the configuring middleware builder

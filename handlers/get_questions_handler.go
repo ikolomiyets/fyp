@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"FYP/db"
 	"FYP/model"
+	"FYP/security"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -30,10 +32,34 @@ func (c Controller) GetSupervisorHandler(ctx *fiber.Ctx) error {
 	return ctx.Status(200).JSON(response)
 
 }
+func (c Controller) GetHasProjectStatusHandler(ctx *fiber.Ctx) error {
+
+	var (
+		authority security.Authority
+		ok        bool
+	)
+	if authority, ok = ctx.UserContext().Value(security.AuthorityKey{}).(security.Authority); !ok {
+		message := model.ErrorMessage{
+			Message: "cannot extract user id",
+		}
+
+		return ctx.Status(401).JSON(message)
+	}
+
+	response, err := c.dbClient.GetHasProjectStatus(ctx.Context(), authority.UserID)
+	if err != nil {
+		message := model.ErrorMessage{
+			Message: err.Error(),
+		}
+		return ctx.Status(500).JSON(message)
+	}
+	return ctx.Status(200).JSON(response)
+
+}
 
 func (c Controller) NewQuestion(ctx *fiber.Ctx) error {
 
-	err := c.dbClient.NewQuestion(ctx.Context())
+	err := c.dbClient.NewQuestion(ctx.Context(), db.Question{})
 	if err != nil {
 		message := model.ErrorMessage{
 			Message: err.Error(),
