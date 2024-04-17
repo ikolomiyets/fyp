@@ -1,10 +1,10 @@
 package db
 
 import (
-	"FYP/model"
 	"context"
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/Simplyphotons/fyp.git/model"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

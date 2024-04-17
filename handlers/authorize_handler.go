@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"FYP/model"
 	"bytes"
 	"encoding/json"
 	"errors"
+	"github.com/Simplyphotons/fyp.git/model"
 	"github.com/gofiber/fiber/v2"
 	"io"
 	"log"

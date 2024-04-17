@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"FYP/db"
-	"FYP/model"
-	"FYP/security"
+	"github.com/Simplyphotons/fyp.git/db"
+	"github.com/Simplyphotons/fyp.git/model"
+	"github.com/Simplyphotons/fyp.git/security"
 	"github.com/gofiber/fiber/v2"
 )
 

@@ -1,4 +1,4 @@
-module FYP
+module github.com/Simplyphotons/fyp.git
 
 go 1.22
 

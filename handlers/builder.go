@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"FYP/auth0"
-	"FYP/db"
-	"FYP/model"
 	"context"
+	"github.com/Simplyphotons/fyp.git/auth0"
+	"github.com/Simplyphotons/fyp.git/db"
+	"github.com/Simplyphotons/fyp.git/model"
 )
 
 type DBClient interface {

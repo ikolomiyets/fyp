@@ -1,10 +1,10 @@
 package oauth2
 
 import (
-	"FYP/security"
 	"context"
 	"errors"
 	"fmt"
+	"github.com/Simplyphotons/fyp.git/security"
 	"github.com/gofiber/fiber/v2"
 )
 

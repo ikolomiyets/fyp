@@ -4,6 +4,7 @@ ADD db /app/db
 ADD handlers /app/handlers
 ADD model /app/model
 ADD oauth2 /app/oauth2
+ADD auth0 /app/auth0
 ADD security /app/security
 ADD main.go go.mod go.sum /app/
 

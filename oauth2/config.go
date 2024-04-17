@@ -1,9 +1,9 @@
 package oauth2
 
 import (
-	"FYP/security"
 	"context"
 	"errors"
+	"github.com/Simplyphotons/fyp.git/security"
 	"github.com/golang-jwt/jwt/v5"
 	"log"
 	"log/slog"

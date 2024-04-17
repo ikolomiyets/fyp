@@ -1,10 +1,10 @@
 package main
 
 import (
-	"FYP/auth0"
-	"FYP/db"
-	"FYP/handlers"
-	"FYP/oauth2"
+	"github.com/Simplyphotons/fyp.git/auth0"
+	"github.com/Simplyphotons/fyp.git/db"
+	"github.com/Simplyphotons/fyp.git/handlers"
+	"github.com/Simplyphotons/fyp.git/oauth2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"log"

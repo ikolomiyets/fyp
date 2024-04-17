@@ -1,12 +1,12 @@
 package handlers
 
 import (
-	"FYP/auth0"
-	"FYP/db"
-	"FYP/model"
-	"FYP/security"
 	"encoding/json"
 	"fmt"
+	"github.com/Simplyphotons/fyp.git/auth0"
+	"github.com/Simplyphotons/fyp.git/db"
+	"github.com/Simplyphotons/fyp.git/model"
+	"github.com/Simplyphotons/fyp.git/security"
 	"github.com/gofiber/fiber/v2"
 	"log/slog"
 	"net/http"

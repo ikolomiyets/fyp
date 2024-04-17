@@ -1,10 +1,10 @@
 package db
 
 import (
-	"FYP/model"
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/Simplyphotons/fyp.git/model"
 	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"log"
